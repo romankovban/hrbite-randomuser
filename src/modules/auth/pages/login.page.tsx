@@ -44,7 +44,7 @@ export const LoginPage: FC<LoginPageProps> = ({}) => {
 
   return (
     <div className="w-96 mx-auto mt-12">
-      <h1 className="text-white text-center text-3xl font-bold m-3">Login</h1>
+      <h1 className="text-center text-3xl font-bold m-3">Login</h1>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
         {errors.root?.message && (
           <Alert color="failure">
