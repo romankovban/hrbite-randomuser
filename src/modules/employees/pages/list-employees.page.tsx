@@ -17,7 +17,7 @@ export const ListEmployees: FC<ListEmployeesProps> = observer(({}) => {
     if (employeeStore.listFetchStatus === 'NOT_STARTED') {
       employeeStore.fetchListOfEmployees({ page: page ? Number(page) : null });
     }
-  }, [page]);
+  }, []);
 
   const onPageChange = (page: number) => {
     setSearchParams({ page: String(page) });
@@ -51,6 +51,7 @@ export const ListEmployees: FC<ListEmployeesProps> = observer(({}) => {
           name={`${employee.name.first} ${employee.name.last}`}
           dob={new Date(employee.dob.date)}
           photo={employee.picture.large}
+          username={employee.login.username}
         />
       ))}
 

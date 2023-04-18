@@ -15,5 +15,6 @@ export const Primary: Story = {
     name: 'Roman Kovban',
     dob: new Date(),
     photo: 'https://randomuser.me/api/portraits/men/25.jpg',
+    username: 'roman',
   },
 };
