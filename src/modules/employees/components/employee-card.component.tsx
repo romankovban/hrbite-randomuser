@@ -23,7 +23,12 @@ export const EmployeeCard: FC<EmployeeCardProps> = ({
 
   return (
     <div className="w-96 cursor-pointer" onClick={handleClick}>
-      <Card imgSrc={photo}>
+      <Card>
+        <img
+          src={photo}
+          alt={`photo-${photo}`}
+          className="h-96 object-fill rounded"
+        />
         <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
           {name}
         </h5>
