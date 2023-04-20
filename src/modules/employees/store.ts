@@ -17,6 +17,7 @@ interface UpdateEmployeeByUsernameParams {
 
 class EmployeeStore {
   listFetchStatus: FetchStatus = 'NOT_STARTED';
+  deleteEmployeeStatus: FetchStatus = 'NOT_STARTED';
   listEmployees: ListEmployeesPaginatedDto['results'] = [];
 
   constructor() {
@@ -36,14 +37,24 @@ class EmployeeStore {
       });
 
       const updatedEmployees = this.getUpdatedEmployees();
-      this.listFetchStatus = 'SUCCESS';
-      this.listEmployees = data.results.map((employee) => {
-        const updatedEmployee = updatedEmployees.find(
-          (emp) => emp.login.username === employee.login.username
-        );
+      const deletedEmployees = this.getDeletedEmployees();
 
-        return updatedEmployee || employee;
-      });
+      this.listFetchStatus = 'SUCCESS';
+      this.listEmployees = data.results
+        .filter((employee) => {
+          const deletedEmployee = deletedEmployees.find(
+            (emp) => emp === employee.login.username
+          );
+
+          return !deletedEmployee;
+        })
+        .map((employee) => {
+          const updatedEmployee = updatedEmployees.find(
+            (emp) => emp.login.username === employee.login.username
+          );
+
+          return updatedEmployee || employee;
+        });
     } catch (e) {
       this.listFetchStatus = 'FAILED';
     }
@@ -65,36 +76,67 @@ class EmployeeStore {
   ) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        const employee = toJS(this.findEmployeeByUsername(username));
+        try {
+          const employee = toJS(this.findEmployeeByUsername(username));
 
-        if (!employee) {
-          throw new Error('no employee');
+          if (!employee) {
+            throw new Error('no employee');
+          }
+
+          employee.name.first = data.firstName;
+          employee.name.last = data.lastName;
+          employee.picture.large = data.photo;
+          employee.dob.date = data.birthDate.toISOString();
+
+          const updatedEmployees = this.getUpdatedEmployees();
+
+          const existingUpdatedEmployeeIndex = updatedEmployees.findIndex(
+            (emp) => emp.login.username === username
+          );
+
+          if (existingUpdatedEmployeeIndex !== -1) {
+            updatedEmployees[existingUpdatedEmployeeIndex] = employee;
+          } else {
+            updatedEmployees.push(employee);
+          }
+
+          this.listEmployees = [];
+          this.listFetchStatus = 'NOT_STARTED';
+
+          localStorage.setItem(
+            'updatedEmployees',
+            JSON.stringify(updatedEmployees)
+          );
+
+          resolve(true);
+        } catch (e) {
+          reject(e);
         }
+      }, 500);
+    });
+  }
 
-        employee.name.first = data.firstName;
-        employee.name.last = data.lastName;
-        employee.picture.large = data.photo;
-        employee.dob.date = data.birthDate.toISOString();
+  getDeletedEmployees(): string[] {
+    return JSON.parse(localStorage.getItem('deletedEmployees') || '[]');
+  }
 
-        const updatedEmployees = this.getUpdatedEmployees();
+  deleteEmployeeByUsername(username: string) {
+    this.deleteEmployeeStatus = 'LOADING';
 
-        const existingUpdatedEmployeeIndex = updatedEmployees.findIndex(
-          (emp) => emp.login.username === username
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const deletedEmployees = this.getDeletedEmployees();
+        deletedEmployees.push(username);
+
+        localStorage.setItem(
+          'deletedEmployees',
+          JSON.stringify(deletedEmployees)
         );
-
-        if (existingUpdatedEmployeeIndex !== -1) {
-          updatedEmployees[existingUpdatedEmployeeIndex] = employee;
-        } else {
-          updatedEmployees.push(employee);
-        }
 
         this.listEmployees = [];
         this.listFetchStatus = 'NOT_STARTED';
 
-        localStorage.setItem(
-          'updatedEmployees',
-          JSON.stringify(updatedEmployees)
-        );
+        this.deleteEmployeeStatus = 'NOT_STARTED';
 
         resolve(true);
       }, 500);

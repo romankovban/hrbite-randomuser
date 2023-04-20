@@ -4,10 +4,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Alert } from 'flowbite-react';
 import { DateTime } from 'luxon';
 import { HrButton } from '../../../common/components/hr-button.component';
+import { observer } from 'mobx-react';
 
 interface EmployeeInfoPageProps {}
 
-export const EmployeeInfoPage: FC<EmployeeInfoPageProps> = ({}) => {
+export const EmployeeInfoPage: FC<EmployeeInfoPageProps> = observer(({}) => {
   const employeeStore = useEmployeeStore();
   const params = useParams();
   const employee = employeeStore.findEmployeeByUsername(params?.username || '');
@@ -15,6 +16,11 @@ export const EmployeeInfoPage: FC<EmployeeInfoPageProps> = ({}) => {
 
   const handleEditClick = () => {
     navigate(`/employee/${params.username}/edit`);
+  };
+
+  const handleDeleteClick = async () => {
+    await employeeStore.deleteEmployeeByUsername(`${params.username}`);
+    navigate('/', { replace: true });
   };
 
   if (!employee) {
@@ -40,9 +46,19 @@ export const EmployeeInfoPage: FC<EmployeeInfoPageProps> = ({}) => {
           employee?.dob.date || new Date().toISOString()
         ).toLocaleString(DateTime.DATE_FULL)}
       </p>
-      <HrButton className="w-36 my-4" onClick={handleEditClick}>
-        Edit
-      </HrButton>
+      <div>
+        <HrButton className="w-36 my-4" onClick={handleEditClick}>
+          Edit
+        </HrButton>
+        <HrButton
+          color="failure"
+          className="w-36 my-4"
+          onClick={handleDeleteClick}
+          isLoading={employeeStore.deleteEmployeeStatus === 'LOADING'}
+        >
+          Delete
+        </HrButton>
+      </div>
     </div>
   );
-};
+});

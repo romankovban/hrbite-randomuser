@@ -55,7 +55,8 @@ export const ListEmployees: FC<ListEmployeesProps> = observer(({}) => {
             username={employee.login.username}
           />
         ))}
-
+      </div>
+      <div className="self-center">
         <Pagination
           currentPage={page ? Number(page) : 1}
           totalPages={10}
