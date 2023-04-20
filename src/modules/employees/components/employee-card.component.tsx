@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Card } from 'flowbite-react';
 import { DateTime } from 'luxon';
-import { redirect, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 interface EmployeeCardProps {
   name: string;
@@ -17,8 +17,16 @@ export const EmployeeCard: FC<EmployeeCardProps> = ({
   username,
 }) => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const handleClick = () => {
-    navigate(`/employee/${username}`);
+    navigate(`/employee/${username}`, {
+      state: {
+        page: searchParams.has('page')
+          ? `page=${searchParams.get('page')}`
+          : '',
+      },
+    });
   };
 
   return (

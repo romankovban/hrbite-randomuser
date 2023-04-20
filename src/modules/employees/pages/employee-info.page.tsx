@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useEmployeeStore } from '../store';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Alert } from 'flowbite-react';
 import { DateTime } from 'luxon';
 import { HrButton } from '../../../common/components/hr-button.component';
@@ -13,14 +13,15 @@ export const EmployeeInfoPage: FC<EmployeeInfoPageProps> = observer(({}) => {
   const params = useParams();
   const employee = employeeStore.findEmployeeByUsername(params?.username || '');
   const navigate = useNavigate();
+  const { state } = useLocation();
 
   const handleEditClick = () => {
     navigate(`/employee/${params.username}/edit`);
   };
-
   const handleDeleteClick = async () => {
     await employeeStore.deleteEmployeeByUsername(`${params.username}`);
-    navigate('/', { replace: true });
+
+    navigate(`/?${state.page}`, { replace: true });
   };
 
   if (!employee) {
