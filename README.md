@@ -23,4 +23,4 @@ Run `yarn dev` and in separate terminal tab run `yarn cypress:open` and follow t
 - Write e2e tests for other flows
 - Visual regression testing via storybook and chromatic
 - Language picker is missing
-  -More "creative" detailed view page
+- More "creative" detailed view page
